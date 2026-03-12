@@ -17,4 +17,5 @@ phases:
     commands:
       - zip -j build.zip dist/frontend/browser/*
 artifacts: 
-  directory: build.zip
+  files: 
+    - build.zip
