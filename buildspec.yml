@@ -3,7 +3,7 @@ version: 0.2
 phases: 
   install:
     runtime-versions:
-      nodejs: 24
+      nodejs: 18
     commands: 
       - echo "insalling tools"
       - npm --v
@@ -13,5 +13,8 @@ phases:
     commands:
       - npm run build
 
+  post_build:
+    commands:
+      - zip -j build.zip dist/frontend/browser/*
 artifacts: 
-  directory: ./dist/frontend/browser
+  directory: build.zip
