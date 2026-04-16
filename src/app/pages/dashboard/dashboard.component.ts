@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { trigger, transition, style, animate, stagger, query } from '@angular/animations';
@@ -664,7 +664,7 @@ Chart.register(...registerables);
     }
   `]
 })
-export class DashboardComponent implements OnInit, AfterViewInit {
+export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('trendChart') trendChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('browserChart') browserChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('deviceChart') deviceChartRef!: ElementRef<HTMLCanvasElement>;
@@ -676,6 +676,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   dashboard = signal<Dashboard | null>(null);
 
   private charts: Chart[] = [];
+  private destroyed = false;
 
   constructor(private analyticsService: AnalyticsService) {}
 
@@ -684,6 +685,11 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {}
+
+  ngOnDestroy() {
+    this.destroyed = true;
+    this.destroyCharts();
+  }
 
   loadDashboard() {
     this.loading.set(true);
@@ -694,7 +700,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       next: (data) => {
         this.dashboard.set(data);
         this.loading.set(false);
-        setTimeout(() => this.renderCharts(data), 100);
+        setTimeout(() => { if (!this.destroyed) this.renderCharts(data); }, 100);
       },
       error: (err) => {
         this.error.set('Failed to load dashboard. Make sure the backend is running.');

@@ -18,6 +18,6 @@ export class UrlService {
   }
 
   getOriginalUrl(code: string): Observable<string> {
-    return this.http.get<string>(`${this.base}/${code}`);
+    return this.http.get(`${this.base}/${code}`, { responseType: 'text' });
   }
 }
