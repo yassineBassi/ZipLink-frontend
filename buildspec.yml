@@ -11,8 +11,13 @@ phases:
       - echo "insalling tools"
       - npm --v
       - node -v
+      - echo "Pull Trivy Image..."
+      - docker pull ghcr.io/aquasecurity/trivy:latest
+
   pre_build:
     commands: 
+      - echo "Scan Code...."
+      - docker run --rm -v $(pwd):/workspace ghcr.io/aquasecurity/trivy:latest fs --ignorefile /workspace/.trivyignore.yml /workspace --exit-code 1 --severity HIGH,CRITICAL --scanners vuln,secret
       - echo "installing dependencies"
       - npm install
       - sed -i "s|BACKEND_URL|$BACKEND_URL|g" src/environments/environment.prod.ts
